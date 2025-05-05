@@ -15,7 +15,7 @@ public class Pawn extends Piece{
 	}
 	
 	public void move(int x, int y) {
-		if((x>8)||(x<0)||(y<0)||(y>8)) {
+		if((x>7)||(x<0)||(y<0)||(y>7)) {
 			System.out.println("Out of bounds!");
 			return;
 		}

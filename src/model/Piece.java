@@ -7,7 +7,7 @@ public class Piece {
 	boolean clr;
 	
 	public Piece(int x, int y, boolean color) {
-		if((x>8)||(x<0)||(y<0)||(x>8)) {
+		if((x>7)||(x<0)||(y<0)||(y>7)) {
 			System.out.println("Falha ao criar peca");
 			return;
 		}
