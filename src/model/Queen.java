@@ -6,6 +6,7 @@ class Queen extends Piece {
         super(x, y, color);
     }
 
+    @Override
     public boolean canMoveTo(int x, int y) {
         int dx = Math.abs(x - getX());
         int dy = Math.abs(y - getY());
@@ -15,18 +16,5 @@ class Queen extends Piece {
         boolean horizontal = getY() == y;
 
         return (diagonal || vertical || horizontal) && !(dx == 0 && dy == 0);
-    }
-
-    public void move(int x, int y) {
-        if ((x > 7) || (x < 0) || (y > 7) || (y < 0)) {
-            System.out.println("Out of bounds!");
-            return;
-        }
-
-        if (canMoveTo(x, y)) {
-            setPosition(x, y);
-        } else {
-            System.out.println("Movimento inválido para rainha");
-        }
     }
 }

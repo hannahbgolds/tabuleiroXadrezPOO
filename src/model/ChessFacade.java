@@ -1,18 +1,14 @@
 package model;
 
 public class ChessFacade {
+    private static ChessFacade instance;
 
-    private static ChessFacade instance = null;
-
-    private Piece[][] board;
-    private boolean currentPlayer; // true = branco, false = preto
-    private Piece selectedPiece;
+    private Piece[][] board = new Piece[8][8];
+    private Piece selectedPiece = null;
+    private boolean whiteTurn = true; // true = branco, false = preto
 
     private ChessFacade() {
-        board = new Piece[8][8];
-        currentPlayer = true;
-        selectedPiece = null;
-        setupInitialPosition();
+        inicializaTabuleiro();
     }
 
     public static ChessFacade getInstance() {
@@ -21,13 +17,13 @@ public class ChessFacade {
         }
         return instance;
     }
-    
+
     public static void resetInstanceForTests() {
-        instance = null;
+        instance = new ChessFacade();
     }
 
-
-    private void setupInitialPosition() {
+    // Inicializa todas as peças no tabuleiro
+    private void inicializaTabuleiro() {
         // Peões
         for (int i = 0; i < 8; i++) {
             board[i][1] = new Pawn(i, 1, false); // pretos
@@ -61,75 +57,54 @@ public class ChessFacade {
         board[4][7] = new King(4, 7, true);
     }
 
-    public boolean selecionaPeca(int x, int y) {
-        if (!posicaoValida(x, y)) return false;
-
-        Piece p = board[x][y];
-        if (p != null && p.getColor() == currentPlayer) {
-            selectedPiece = p;
-            return true;
-        }
-        return false;
-    }
-    
-    private boolean isPathClear(int x1, int y1, int x2, int y2) {
-        int dx = Integer.compare(x2, x1);
-        int dy = Integer.compare(y2, y1);
-
-        int cx = x1 + dx;
-        int cy = y1 + dy;
-
-        while (cx != x2 || cy != y2) {
-            if (board[cx][cy] != null) {
-                return false; // tem peça no caminho
-            }
-            cx += dx;
-            cy += dy;
-        }
-        return true;
-    }
-
-
-    public boolean selecionaCasa(int x, int y) {
-        if (!posicaoValida(x, y) || selectedPiece == null) return false;
-
-        // Regra de movimento básica da peça
-        if (!selectedPiece.canMoveTo(x, y)) return false;
-
-        // Verifica se há peça do mesmo jogador no destino
-        Piece destino = board[x][y];
-        if (destino != null && destino.getColor() == selectedPiece.getColor()) return false;
-
-        // Verifica caminho livre para peças que precisam
-        boolean precisaVerificarCaminho =
-            selectedPiece instanceof Rook ||
-            selectedPiece instanceof Bishop ||
-            selectedPiece instanceof Queen ||
-            (selectedPiece instanceof Pawn && x == selectedPiece.getX()); // avanço vertical
-
-        if (precisaVerificarCaminho) {
-            if (!isPathClear(selectedPiece.getX(), selectedPiece.getY(), x, y)) return false;
-        }
-
-        // Salva posição antiga e move
-        int oldX = selectedPiece.getX();
-        int oldY = selectedPiece.getY();
-        selectedPiece.move(x, y);
-        board[oldX][oldY] = null;
-        board[selectedPiece.getX()][selectedPiece.getY()] = selectedPiece;
-
-        currentPlayer = !currentPlayer;
-        selectedPiece = null;
-        return true;
-    }
-
-
+    // Retorna a peça na posição (x, y) se houver
     public Piece getPieceAt(int x, int y) {
-        if (!posicaoValida(x, y)) return null;
+        if (!isInBounds(x, y)) return null;
         return board[x][y];
     }
 
-    private boolean posicaoValida(int x, int y) {
-        return x >= 0 && x < 8 && y >= 0 && y < 8;
+    // Seleciona a peça na posição informada, se for da cor da vez
+    public boolean selecionaPeca(int x, int y) {
+        if (!isInBounds(x, y)) return false;
+
+        Piece p = board[x][y];
+        if (p != null && p.getColor() == whiteTurn) {
+            selectedPiece = p;
+            return true;
+        }
+
+        selectedPiece = null;
+        return false;
+    }
+
+    // Tenta mover a peça selecionada para a nova posição
+    public boolean selecionaCasa(int x, int y) {
+        if (selectedPiece == null || !isInBounds(x, y)) return false;
+
+        int fromX = selectedPiece.getX();
+        int fromY = selectedPiece.getY();
+
+        // Verifica se pode se mover para a posição
+        if (!selectedPiece.canMoveTo(x, y)) return false;
+
+        Piece destino = board[x][y];
+        if (destino != null && destino.getColor() == selectedPiece.getColor()) {
+            return false; // não pode capturar peça da mesma cor
+        }
+
+        // Atualiza o tabuleiro: move a peça e limpa a casa antiga
+        board[fromX][fromY] = null;
+        board[x][y] = selectedPiece;
+        selectedPiece.move(x, y);
+
+        // Troca o turno e limpa seleção
+        whiteTurn = !whiteTurn;
+        selectedPiece = null;
+
+        return true;
+    }
+
+    private boolean isInBounds(int x, int y) {
+        return x >= 0 && x <= 7 && y >= 0 && y <= 7;
     }
 }
