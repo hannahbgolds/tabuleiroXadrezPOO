@@ -1,6 +1,6 @@
 package model;
 
-class Piece {
+public class Piece {
     private int xSqr;
     private int ySqr;
     private boolean clr;

@@ -1,9 +1,0 @@
-/**
- * 
- */
-/**
- * 
- */
-module xadrezTabuleiroPOO {
-	requires junit;
-}
