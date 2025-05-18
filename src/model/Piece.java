@@ -4,7 +4,7 @@ package model;
  * Classe abstrata que representa uma peça genérica de xadrez.
  * Define a posição e cor da peça, bem como regras básicas de movimento.
  */
-public abstract class Piece {
+abstract class Piece {
     private int xSqr;       // Posição horizontal no tabuleiro (coluna)
     private int ySqr;       // Posição vertical no tabuleiro (linha)
     private boolean clr;    // Cor da peça: true para branco, false para preto

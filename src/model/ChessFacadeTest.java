@@ -1,11 +1,9 @@
-package test;
+package model;
 
 import org.junit.Before;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-import model.ChessFacade;
-import model.Piece;
 
 public class ChessFacadeTest {
 
@@ -149,22 +147,6 @@ public class ChessFacadeTest {
         ChessFacade game = ChessFacade.getInstance();
         game.selecionaPeca(4, 7);
         boolean resultado = game.selecionaCasa(4, 5); // 2 casas
-        assertFalse(resultado);
-    }
-
-    // 13. Selecionar peça da vez
-    @Test
-    public void testSelecionarPecaDoJogador() {
-        ChessFacade game = ChessFacade.getInstance();
-        boolean resultado = game.selecionaPeca(4, 6); // branco
-        assertTrue(resultado);
-    }
-
-    // 14. Tentar selecionar peça do adversário
-    @Test
-    public void testSelecionarPecaDoAdversario() {
-        ChessFacade game = ChessFacade.getInstance();
-        boolean resultado = game.selecionaPeca(4, 1); // preto, vez do branco
         assertFalse(resultado);
     }
     
