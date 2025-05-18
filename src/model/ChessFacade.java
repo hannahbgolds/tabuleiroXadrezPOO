@@ -100,6 +100,12 @@ public class ChessFacade {
         // Troca o turno e limpa seleção
         whiteTurn = !whiteTurn;
         selectedPiece = null;
+        
+        boolean emCheque = isKingInCheck(whiteTurn);
+        if (emCheque) {
+            System.out.println("Cheque no rei " + (whiteTurn ? "branco" : "preto") + "!");
+        }
+
 
         return true;
     }
@@ -107,4 +113,62 @@ public class ChessFacade {
     private boolean isInBounds(int x, int y) {
         return x >= 0 && x <= 7 && y >= 0 && y <= 7;
     }
+    
+    private Piece findKing(boolean color) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Piece p = board[x][y];
+                if (p instanceof King && p.getColor() == color) {
+                    return p;
+                }
+            }
+        }
+        return null;
+    }
+    
+    private boolean isSquareUnderAttack(int x, int y, boolean byColor) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board[i][j];
+                if (p != null && p.getColor() == byColor && p.canMoveTo(x, y)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    public boolean isKingInCheck(boolean color) {
+        Piece king = findKing(color);
+        if (king == null) return false;
+
+        return isSquareUnderAttack(king.getX(), king.getY(), !color);
+    }
+
+ // Apenas para uso em testes!
+    public void limparTabuleiro() {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                board[x][y] = null;
+            }
+        }
+        selectedPiece = null;
+        whiteTurn = true;
+    }
+
+    // Apenas para testes — adiciona peça genérica
+    public void adicionarPeca(String tipo, int x, int y, boolean cor) {
+        switch (tipo.toLowerCase()) {
+            case "rei": board[x][y] = new King(x, y, cor); break;
+            case "rainha": board[x][y] = new Queen(x, y, cor); break;
+            case "torre": board[x][y] = new Rook(x, y, cor); break;
+            case "bispo": board[x][y] = new Bishop(x, y, cor); break;
+            case "cavalo": board[x][y] = new Knight(x, y, cor); break;
+            case "peao": board[x][y] = new Pawn(x, y, cor); break;
+            default:
+                throw new IllegalArgumentException("Tipo de peça inválido: " + tipo);
+        }
+    }
+
+
 }

@@ -167,4 +167,43 @@ public class ChessFacadeTest {
         boolean resultado = game.selecionaPeca(4, 1); // preto, vez do branco
         assertFalse(resultado);
     }
+    
+    @Test
+    public void testChequeDireto() {
+        ChessFacade game = ChessFacade.getInstance();
+        ChessFacade.resetInstanceForTests();
+
+        game.limparTabuleiro();
+
+        game.adicionarPeca("rei", 4, 0, false);     // Rei preto
+        game.adicionarPeca("rainha", 4, 2, true);   // Rainha branca
+
+        game.selecionaPeca(4, 2);
+        game.selecionaCasa(4, 1); // Rainha ataca o rei preto
+
+        assertTrue("Rei preto deve estar em cheque após ataque direto da rainha",
+                game.isKingInCheck(false));
+        
+    }
+    
+    @Test
+    public void testChequeDescoberto() {
+        ChessFacade game = ChessFacade.getInstance();
+        ChessFacade.resetInstanceForTests();
+
+        game.limparTabuleiro();
+
+        game.adicionarPeca("rei", 4, 0, false);     // Rei preto
+        game.adicionarPeca("torre", 4, 3, true);    // Torre branca
+        game.adicionarPeca("peao", 4, 2, true);     // Peão branco bloqueando
+
+        game.selecionaPeca(4, 2);
+        game.selecionaCasa(4, 1); // Peão sai da frente → torre ameaça o rei
+
+        assertTrue("Rei preto deve estar em cheque descoberto após movimento do peão",
+                game.isKingInCheck(false));
+    }
+
+    
+
 }
