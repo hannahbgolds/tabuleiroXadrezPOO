@@ -1,5 +1,7 @@
 package test;
 
+import org.junit.Before;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 import model.ChessFacade;
@@ -7,7 +9,13 @@ import model.Piece;
 
 public class ChessFacadeTest {
 
-    // 1. Peão - válido
+    
+	@Before
+	public void resetGame() {
+	    ChessFacade.resetInstanceForTests();
+	}
+	
+	// 1. Peão - válido
     @Test
     public void testPawnValidMove() {
         ChessFacade game = ChessFacade.getInstance();
@@ -33,9 +41,9 @@ public class ChessFacadeTest {
     @Test
     public void testRookValidMove() {
         ChessFacade game = ChessFacade.getInstance();
-        game.selecionaPeca(0, 6);
-        game.selecionaCasa(0, 5); // tira peão
-        game.selecionaPeca(0, 7); // torre
+        game.selecionaPeca(0, 6); // tira peão
+        game.selecionaCasa(0, 5);
+        game.selecionaPeca(0, 7); // torre branca
         boolean resultado = game.selecionaCasa(0, 6);
         assertTrue(resultado);
     }
@@ -71,10 +79,10 @@ public class ChessFacadeTest {
     @Test
     public void testBishopValidMove() {
         ChessFacade game = ChessFacade.getInstance();
-        game.selecionaPeca(2, 6);
-        game.selecionaCasa(2, 5); // tira peão
-        game.selecionaPeca(2, 7); // bispo
-        boolean resultado = game.selecionaCasa(4, 5);
+        game.selecionaPeca(2, 6); // tira peão da frente
+        game.selecionaCasa(2, 5);
+        game.selecionaPeca(2, 7); // bispo branco
+        boolean resultado = game.selecionaCasa(4, 5); // movimento diagonal
         assertTrue(resultado);
     }
 
@@ -91,10 +99,10 @@ public class ChessFacadeTest {
     @Test
     public void testQueenValidMove() {
         ChessFacade game = ChessFacade.getInstance();
-        game.selecionaPeca(3, 6);
+        game.selecionaPeca(3, 6); // tira peão
         game.selecionaCasa(3, 5);
-        game.selecionaPeca(3, 7);
-        boolean resultado = game.selecionaCasa(5, 5); // diagonal
+        game.selecionaPeca(3, 7); // rainha
+        boolean resultado = game.selecionaCasa(5, 5); // movimento diagonal
         assertTrue(resultado);
     }
 

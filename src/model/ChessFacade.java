@@ -21,6 +21,11 @@ public class ChessFacade {
         }
         return instance;
     }
+    
+    public static void resetInstanceForTests() {
+        instance = null;
+    }
+
 
     private void setupInitialPosition() {
         // Peões
@@ -66,35 +71,58 @@ public class ChessFacade {
         }
         return false;
     }
+    
+    private boolean isPathClear(int x1, int y1, int x2, int y2) {
+        int dx = Integer.compare(x2, x1);
+        int dy = Integer.compare(y2, y1);
+
+        int cx = x1 + dx;
+        int cy = y1 + dy;
+
+        while (cx != x2 || cy != y2) {
+            if (board[cx][cy] != null) {
+                return false; // tem peça no caminho
+            }
+            cx += dx;
+            cy += dy;
+        }
+        return true;
+    }
+
 
     public boolean selecionaCasa(int x, int y) {
         if (!posicaoValida(x, y) || selectedPiece == null) return false;
 
-        if (selectedPiece instanceof Pawn) {
-            ((Pawn) selectedPiece).move(x, y);
-        } else if (selectedPiece instanceof Rook) {
-            ((Rook) selectedPiece).move(x, y);
-        } else if (selectedPiece instanceof Knight) {
-            ((Knight) selectedPiece).move(x, y);
-        } else if (selectedPiece instanceof Bishop) {
-            ((Bishop) selectedPiece).move(x, y);
-        } else if (selectedPiece instanceof Queen) {
-            ((Queen) selectedPiece).move(x, y);
-        } else if (selectedPiece instanceof King) {
-            ((King) selectedPiece).move(x, y);
+        // Regra de movimento básica da peça
+        if (!selectedPiece.canMoveTo(x, y)) return false;
+
+        // Verifica se há peça do mesmo jogador no destino
+        Piece destino = board[x][y];
+        if (destino != null && destino.getColor() == selectedPiece.getColor()) return false;
+
+        // Verifica caminho livre para peças que precisam
+        boolean precisaVerificarCaminho =
+            selectedPiece instanceof Rook ||
+            selectedPiece instanceof Bishop ||
+            selectedPiece instanceof Queen ||
+            (selectedPiece instanceof Pawn && x == selectedPiece.getX()); // avanço vertical
+
+        if (precisaVerificarCaminho) {
+            if (!isPathClear(selectedPiece.getX(), selectedPiece.getY(), x, y)) return false;
         }
 
-        // Atualiza tabuleiro
+        // Salva posição antiga e move
         int oldX = selectedPiece.getX();
         int oldY = selectedPiece.getY();
+        selectedPiece.move(x, y);
         board[oldX][oldY] = null;
         board[selectedPiece.getX()][selectedPiece.getY()] = selectedPiece;
 
-        // Passa a vez
         currentPlayer = !currentPlayer;
         selectedPiece = null;
         return true;
     }
+
 
     public Piece getPieceAt(int x, int y) {
         if (!posicaoValida(x, y)) return null;

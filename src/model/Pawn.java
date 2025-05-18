@@ -1,54 +1,45 @@
 package model;
 
 class Pawn extends Piece {
-    int[] xSeen;
-    int[] ySeen;
-    boolean hasMoved;
+    private boolean hasMoved;
 
     public Pawn(int x, int y, boolean color) {
         super(x, y, color);
         this.hasMoved = false;
-        seenSquares(x, y);
     }
 
+    @Override
+    public boolean canMoveTo(int x, int y) {
+        int dx = Math.abs(x - getX());
+        int dy = y - getY();
+        int dir = getColor() ? -1 : 1; // branco sobe (-1), preto desce (+1)
+
+        // Movimento reto (avanço simples ou duplo)
+        if (x == getX()) {
+            if (!hasMoved && dy == 2 * dir) return true;
+            if (dy == dir) return true;
+        }
+
+        // Movimento diagonal (captura) — verificado no ChessFacade
+        if (dx == 1 && dy == dir) {
+            return true; // indica que a captura é possível
+        }
+
+        return false;
+    }
+
+    @Override
     public void move(int x, int y) {
-        if((x > 7) || (x < 0) || (y < 0) || (y > 7)) {
+        if ((x > 7) || (x < 0) || (y < 0) || (y > 7)) {
             System.out.println("Out of bounds!");
             return;
         }
 
-        if(validateX(x) && validateY(y)) {
-            if(!this.hasMoved) {
-                this.hasMoved = true;
-            }
-            seenSquares(x, y);
-            setPosition(x, y); // <- precisa atualizar posição
+        if (canMoveTo(x, y)) {
+            setPosition(x, y);
+            hasMoved = true;
         } else {
-            System.out.println("Invalid Coordinates");
+            System.out.println("Movimento inválido para peão");
         }
-    }
-
-    private void seenSquares(int x, int y) {
-        if(this.hasMoved) {
-            this.xSeen = new int[] {x};
-            this.ySeen = new int[] {y + 1};
-        } else {
-            this.xSeen = new int[] {x};
-            this.ySeen = new int[] {y + 1, y + 2};
-        }
-    }
-
-    private boolean validateX(int x) {
-        for(int i : xSeen) {
-            if(i == x) return true;
-        }
-        return false;
-    }
-
-    private boolean validateY(int y) {
-        for(int i : ySeen) {
-            if(i == y) return true;
-        }
-        return false;
     }
 }

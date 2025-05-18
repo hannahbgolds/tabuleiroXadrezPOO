@@ -1,6 +1,6 @@
 package model;
 
-public class Piece {
+public abstract class Piece {
     private int xSqr;
     private int ySqr;
     private boolean clr;
@@ -31,5 +31,9 @@ public class Piece {
         this.xSqr = x;
         this.ySqr = y;
     }
+
+    public abstract boolean canMoveTo(int x, int y);
+    public abstract void move(int x, int y);
 }
+
 

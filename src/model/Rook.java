@@ -6,18 +6,19 @@ class Rook extends Piece {
         super(x, y, color);
     }
 
+    @Override
     public boolean canMoveTo(int x, int y) {
-//         Verifica se é movimento reto horizontal ou vertical
         return (x == getX() || y == getY()) && !(x == getX() && y == getY());
     }
 
+    @Override
     public void move(int x, int y) {
-        if((x > 7) || (x < 0) || (y < 0) || (y > 7)) {
+        if ((x > 7) || (x < 0) || (y > 7) || (y < 0)) {
             System.out.println("Out of bounds!");
             return;
         }
 
-        if(canMoveTo(x, y)) {
+        if (canMoveTo(x, y)) {
             setPosition(x, y);
         } else {
             System.out.println("Movimento inválido para torre");
