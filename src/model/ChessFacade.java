@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 public class ChessFacade {
     private static ChessFacade instance;
 
@@ -100,7 +102,8 @@ public class ChessFacade {
         board[fromX][fromY] = null;
         selectedPiece.move(x, y);              // atualiza posição interna primeiro
         board[x][y] = selectedPiece;           // depois grava no tabuleiro
-
+        
+        promoverPeao(x,y);
 
         // Troca o turno e limpa seleção
         whiteTurn = !whiteTurn;
@@ -220,6 +223,42 @@ public class ChessFacade {
         return true;
     }
 
-    
+    public void promoverPeao(int x, int y) {
+        Piece p = getPieceAt(x, y);
+        if (!(p instanceof Pawn)) return;
+
+        boolean isBranco = p.getColor();
+        int linhaFinal = isBranco ? 0 : 7;
+
+        if (p.getY() != linhaFinal) return;
+
+        // Janela Swing de escolha
+        String[] opcoes = {"Rainha", "Torre", "Bispo", "Cavalo"};
+        String escolha = (String) JOptionPane.showInputDialog(
+                null,
+                "Escolha a peça para promoção:",
+                "Promoção de Peão",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                opcoes,
+                "Rainha"
+        );
+
+        if (escolha == null) escolha = "Rainha";
+
+        Piece novaPeca = switch (escolha.toLowerCase()) {
+            case "torre" -> new Rook(x, y, isBranco);
+            case "bispo" -> new Bishop(x, y, isBranco);
+            case "cavalo" -> new Knight(x, y, isBranco);
+            default -> new Queen(x, y, isBranco);
+        };
+
+        board[x][y] = novaPeca;
+        System.out.println("Peão promovido a: " + escolha);
+    }
+
+
     
 }
+
+
