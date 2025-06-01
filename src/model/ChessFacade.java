@@ -131,7 +131,7 @@ public class ChessFacade {
         return null;
     }
     
-    private boolean isSquareUnderAttack(int x, int y, boolean byColor) {
+    public boolean isSquareUnderAttack(int x, int y, boolean byColor) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Piece p = board[i][j];
