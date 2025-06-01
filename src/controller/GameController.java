@@ -3,19 +3,28 @@ package controller;
 import model.ChessFacade;
 
 public class GameController {
-    private ChessFacade model;
-
-    public GameController() {
-        this.model = ChessFacade.getInstance();
-    }
+    private final ChessFacade model = ChessFacade.getInstance();
+    private boolean esperandoDestino = false; // false = esperando selecionar peça
 
     public void tratarClique(int col, int row) {
-        System.out.println("Clique recebido: " + col + "," + row);
-
-        // Exemplo mínimo de lógica:
-        // Se uma peça ainda não foi selecionada → seleciona
-        // Se já tiver uma selecionada → tenta movimentar
-        // (isso você vai implementar depois)
+        if (!esperandoDestino) {
+            boolean selecionou = model.selecionaPeca(col, row);
+            if (selecionou) {
+                esperandoDestino = true;
+                System.out.println("Peça selecionada em: " + col + "," + row);
+            } else {
+                System.out.println("Nenhuma peça válida nessa posição.");
+            }
+        } else {
+            boolean moveu = model.selecionaCasa(col, row);
+            if (moveu) {
+                esperandoDestino = false;
+                System.out.println("Movimento realizado para: " + col + "," + row);
+            } else {
+                System.out.println("Movimento inválido. Reiniciando jogada.");
+                esperandoDestino = false; // força reinício da seleção
+            }
+        }
     }
 }
 
