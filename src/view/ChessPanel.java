@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.awt.Point;
 
 import controller.GameController;
 import model.ChessFacade;
@@ -19,10 +21,12 @@ public class ChessPanel extends JPanel {
     private static final int BOARD_SIZE = 8;
 
     private final ChessFacade model = ChessFacade.getInstance();
-    private final GameController controller = new GameController();
+    private final GameController controller = new GameController(); 
+
 
     // Armazena as imagens já carregadas para não recarregar sempre
     private final Map<String, Image> imagens = new HashMap<>();
+    private List<Point> casasValidas = null;
 
     public ChessPanel() {
         setPreferredSize(new Dimension(CELL_SIZE * BOARD_SIZE, CELL_SIZE * BOARD_SIZE));
@@ -55,6 +59,14 @@ public class ChessPanel extends JPanel {
             }
         }
 
+        // Destaca casas válidas
+        if (casasValidas != null) {
+            g2.setColor(new Color(255, 255, 0, 128)); // amarelo translúcido
+            for (Point p : casasValidas) {
+                g2.fillRect(p.x * CELL_SIZE, p.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            }
+        }
+
         // Desenha as peças com base no model
         for (int x = 0; x < BOARD_SIZE; x++) {
             for (int y = 0; y < BOARD_SIZE; y++) {
@@ -80,5 +92,9 @@ public class ChessPanel extends JPanel {
             }
         }
         return imagens.get(id);
+    }
+
+    public void setCasasValidas(List<Point> casas) {
+        this.casasValidas = casas;
     }
 }

@@ -1,5 +1,9 @@
 package model;
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChessFacade {
     private static ChessFacade instance;
 
@@ -179,5 +183,24 @@ public class ChessFacade {
         String tipo = p.getClass().getSimpleName().toLowerCase(); // exemplo: "pawn"
 
         return tipo + "_" + cor;
+    }
+    
+    public List<Point> getCasasValidasParaPecaSelecionada() {
+        List<Point> validMoves = new ArrayList<>();
+
+        if (selectedPiece == null) return validMoves;
+
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (selectedPiece.canMoveTo(x, y)) {
+                    Piece destino = board[x][y];
+                    if (destino == null || destino.getColor() != selectedPiece.getColor()) {
+                        validMoves.add(new Point(x, y));
+                    }
+                }
+            }
+        }
+
+        return validMoves;
     }
 }
