@@ -170,6 +170,14 @@ public class ChessFacade {
                 throw new IllegalArgumentException("Tipo de peça inválido: " + tipo);
         }
     }
+    
+    public String getPieceIdAt(int x, int y) {
+        Piece p = getPieceAt(x, y);
+        if (p == null) return null;
 
+        String cor = p.getColor() ? "white" : "black";
+        String tipo = p.getClass().getSimpleName().toLowerCase(); // exemplo: "pawn"
 
+        return tipo + "_" + cor;
+    }
 }
