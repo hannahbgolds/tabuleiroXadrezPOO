@@ -1,8 +1,8 @@
 package model;
 
 class King extends Piece {
-
-    /**
+    
+	/**
      * Cria um novo Rei com posição inicial e cor.
      *
      * @param x     Coluna inicial.
@@ -28,26 +28,4 @@ class King extends Piece {
 
         return (dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0);
     }
-
-    /**
-     * Tenta mover o Rei para (x, y), validando limites e movimento.
-     * Este método sobrescreve a versão da superclasse e não chama pósMovimento().
-     *
-     * @param x Coluna de destino.
-     * @param y Linha de destino.
-     */
-    @Override
-    public void move(int x, int y) {
-        if ((x > 7) || (x < 0) || (y > 7) || (y < 0)) {
-            System.out.println("Out of bounds!");
-            return;
-        }
-
-        if (canMoveTo(x, y)) {
-            setPosition(x, y);
-        } else {
-            System.out.println("Movimento inválido para rei");
-        }
-    }
-}
-
+ }

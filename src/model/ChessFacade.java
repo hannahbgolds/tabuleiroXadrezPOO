@@ -144,6 +144,7 @@ public class ChessFacade {
 
         return isSquareUnderAttack(king.getX(), king.getY(), !color);
     }
+    
 
  // Apenas para uso em testes!
     public void limparTabuleiro() {
