@@ -98,8 +98,9 @@ public class ChessFacade {
 
         // Atualiza o tabuleiro: move a peça e limpa a casa antiga
         board[fromX][fromY] = null;
-        board[x][y] = selectedPiece;
-        selectedPiece.move(x, y);
+        selectedPiece.move(x, y);              // atualiza posição interna primeiro
+        board[x][y] = selectedPiece;           // depois grava no tabuleiro
+
 
         // Troca o turno e limpa seleção
         whiteTurn = !whiteTurn;
@@ -219,5 +220,6 @@ public class ChessFacade {
         return true;
     }
 
+    
     
 }

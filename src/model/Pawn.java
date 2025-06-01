@@ -2,6 +2,7 @@ package model;
 
 class Pawn extends Piece {
     private boolean hasMoved; // Indica se o peão já se moveu (para permitir o avanço de duas casas)
+    private static final ChessFacade model = ChessFacade.getInstance();
 
     /**
      * Cria um novo Peão com posição inicial e cor.
@@ -26,21 +27,39 @@ class Pawn extends Piece {
      */
     @Override
     public boolean canMoveTo(int x, int y) {
-        int dx = Math.abs(x - getX());
+        if (!isInBounds(x, y)) return false;
+
+        int dx = x - getX();
         int dy = y - getY();
-        int dir = getColor() ? -1 : 1; // Peões brancos sobem (-1), pretos descem (+1)
 
-        // Movimento de captura na diagonal
-        if (dx == 1 && dy == dir) return true;
+        ChessFacade facade = ChessFacade.getInstance();
+        Piece destino = facade.getPieceAt(x, y);
 
-        // Movimento reto para frente
-        if (dx == 0) {
-            if (!hasMoved && dy == 2 * dir) return true;
-            if (dy == dir) return true;
+        boolean isBranco = getColor();
+        int direcao = isBranco ? -1 : 1;
+
+        // CAPTURA: 1 casa na diagonal para frente se houver inimigo
+        if (Math.abs(dx) == 1 && dy == direcao) {
+            return destino != null && destino.getColor() != isBranco;
         }
 
+        // AVANÇO DE 1 CASA
+        if (dx == 0 && dy == direcao && destino == null) {
+            return true;
+        }
+
+        // AVANÇO DE 2 CASAS (primeiro movimento apenas)
+        int linhaInicial = isBranco ? 6 : 1;
+        if (dx == 0 && dy == 2 * direcao && getY() == linhaInicial) {
+            int meioY = getY() + direcao;
+            return destino == null && facade.getPieceAt(x, meioY) == null;
+        }
+
+        // Caso contrário, movimento inválido
         return false;
     }
+
+
 
     /**
      * Marca que o Peão já se moveu (para impedir segundo avanço duplo).
