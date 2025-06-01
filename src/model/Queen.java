@@ -24,13 +24,10 @@ class Queen extends Piece {
      */
     @Override
     public boolean canMoveTo(int x, int y) {
-        int dx = Math.abs(x - getX());
-        int dy = Math.abs(y - getY());
+        Rook rook = new Rook(getX(), getY(), getColor());
+        Bishop bishop = new Bishop(getX(), getY(), getColor());
 
-        boolean diagonal = dx == dy;
-        boolean vertical = getX() == x;
-        boolean horizontal = getY() == y;
-
-        return (diagonal || vertical || horizontal) && !(dx == 0 && dy == 0);
+        return rook.canMoveTo(x, y) || bishop.canMoveTo(x, y);
     }
+
 }

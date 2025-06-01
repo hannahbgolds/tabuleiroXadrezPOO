@@ -59,13 +59,20 @@ public class ChessPanel extends JPanel {
             }
         }
 
-        // Destaca casas válidas
-        if (casasValidas != null) {
-            g2.setColor(new Color(255, 255, 0, 128)); // amarelo translúcido
-            for (Point p : casasValidas) {
-                g2.fillRect(p.x * CELL_SIZE, p.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-            }
+     // Destaca casa da peça selecionada
+        if (controller.estaEsperandoDestino()) {
+            int origemX = controller.getOrigemX();
+            int origemY = controller.getOrigemY();
+            g2.setColor(new Color(255, 255, 0, 128)); // amarelo semi-transparente
+            g2.fillRect(origemX * CELL_SIZE, origemY * CELL_SIZE, CELL_SIZE, CELL_SIZE);
         }
+
+        // Destaca casas válidas
+        g2.setColor(new Color(0, 255, 0, 128)); // verde semi-transparente
+        for (Point p : controller.getCasasAlcancaveis()) {
+            g2.fillRect(p.x * CELL_SIZE, p.y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+        }
+
 
         // Desenha as peças com base no model
         for (int x = 0; x < BOARD_SIZE; x++) {

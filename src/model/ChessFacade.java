@@ -203,4 +203,21 @@ public class ChessFacade {
 
         return validMoves;
     }
+    
+    public boolean isPathClear(int x1, int y1, int x2, int y2) {
+        int dx = Integer.compare(x2 - x1, 0);
+        int dy = Integer.compare(y2 - y1, 0);
+
+        int cx = x1 + dx;
+        int cy = y1 + dy;
+
+        while (cx != x2 || cy != y2) {
+            if (getPieceAt(cx, cy) != null) return false;
+            cx += dx;
+            cy += dy;
+        }
+        return true;
+    }
+
+    
 }

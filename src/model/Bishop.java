@@ -23,7 +23,21 @@ class Bishop extends Piece {
      */
     @Override
     public boolean canMoveTo(int x, int y) {
-        int dx = Math.abs(x - getX());
-        return dx != 0 && dx == Math.abs(y - getY());
+        if (Math.abs(x - getX()) != Math.abs(y - getY())) return false;
+
+        int dx = Integer.compare(x, getX());
+        int dy = Integer.compare(y, getY());
+
+        int cx = getX() + dx;
+        int cy = getY() + dy;
+
+        while (cx != x && cy != y) {
+            if (ChessFacade.getInstance().getPieceAt(cx, cy) != null) return false;
+            cx += dx;
+            cy += dy;
+        }
+
+        return true;
     }
+
 }
