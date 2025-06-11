@@ -19,6 +19,6 @@ public class ChessFrame extends JFrame {
     }
 
     public static void main(String[] args) {
-        new ChessFrame(); // Inicia o programa
+        new ChessFrame(); 
     }
 }
