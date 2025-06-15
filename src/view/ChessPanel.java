@@ -1,6 +1,10 @@
 package view;
 
 import javax.imageio.ImageIO;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -39,11 +43,44 @@ public class ChessPanel extends Canvas {
         setBackground(Color.WHITE);
 
         addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
-                int col = e.getX() / CELL_SIZE;
-                int row = e.getY() / CELL_SIZE;
-                controller.tratarClique(col, row);
-                repaint(); // redesenha após clique
+                if (e.isPopupTrigger()) {
+                    mostrarMenuPopup(e);
+                } else {
+                    int col = e.getX() / CELL_SIZE;
+                    int row = e.getY() / CELL_SIZE;
+                    controller.tratarClique(col, row);
+                    repaint(); 
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    mostrarMenuPopup(e);
+                }
+            }
+
+            private void mostrarMenuPopup(MouseEvent e) {
+                JPopupMenu menu = new JPopupMenu();
+
+                JMenuItem salvar = new JMenuItem("Salvar Partida");
+                salvar.addActionListener(ev -> {
+                    JOptionPane.showMessageDialog(null, "Função de salvar ainda não implementada.");
+                });
+
+                JMenuItem encerrar = new JMenuItem("Encerrar Partida");
+                encerrar.addActionListener(ev -> {
+                    int confirm = JOptionPane.showConfirmDialog(null, "Deseja encerrar a partida?", "Confirmar", JOptionPane.YES_NO_OPTION);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        System.exit(0);
+                    }
+                });
+
+                menu.add(salvar);
+                menu.add(encerrar);
+                menu.show(e.getComponent(), e.getX(), e.getY());
             }
         });
     }
@@ -108,4 +145,5 @@ public class ChessPanel extends Canvas {
     public void setCasasValidas(List<Point> casas) {
         this.casasValidas = casas;
     }
+  
 }
