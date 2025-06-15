@@ -6,6 +6,8 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import view.InterfaceFacade;
+
 public class ChessFacade implements Observado {
     private static ChessFacade instance;
 
@@ -116,6 +118,20 @@ public class ChessFacade implements Observado {
         }
 
         notificarObservadores();
+        
+        if (isCheckmate(!whiteTurn)) {
+            for (Observador obs : observadores) {
+                if (obs instanceof InterfaceFacade gui) {
+                    gui.mostrarMensagem("Xeque-mate! O jogador " + (whiteTurn ? "branco" : "preto") + " venceu!");
+                }
+            }
+        } else if (isStalemate(!whiteTurn)) {
+            for (Observador obs : observadores) {
+                if (obs instanceof InterfaceFacade gui) {
+                    gui.mostrarMensagem("Empate por congelamento (stalemate).");
+                }
+            }
+        }
 
         return true;
     }
@@ -264,7 +280,139 @@ public class ChessFacade implements Observado {
         
         notificarObservadores();
     }
+    
+    private boolean isCheckmate(boolean color) {
+        if (!isKingInCheck(color)) return false;
 
+        Piece king = findKing(color);
+
+        // 1. Verifica se o rei pode fugir para alguma casa segura
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0) continue;
+                int nx = king.getX() + dx;
+                int ny = king.getY() + dy;
+                if (!isInBounds(nx, ny)) continue;
+
+                Piece destino = getPieceAt(nx, ny);
+                if ((destino == null || destino.getColor() != color) && king.canMoveTo(nx, ny)) {
+                    // Testa se a casa não está sob ataque
+                    Piece original = board[nx][ny];
+                    board[king.getX()][king.getY()] = null;
+                    board[nx][ny] = king;
+                    boolean aindaEmCheque = isKingInCheck(color);
+                    board[nx][ny] = original;
+                    board[king.getX()][king.getY()] = king;
+
+                    if (!aindaEmCheque) return false;
+                }
+            }
+        }
+
+        // 2. Verifica se alguma peça aliada pode capturar o atacante ou bloquear o ataque
+        List<Piece> atacantes = getAtacantesDoRei(color);
+        if (atacantes.size() >= 2) return true; // duplo cheque só o rei pode mover
+
+        Piece atacante = atacantes.get(0);
+        int ax = atacante.getX(), ay = atacante.getY();
+
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Piece p = board[x][y];
+                if (p != null && p.getColor() == color && !(p instanceof King)) {
+                    if (p.canMoveTo(ax, ay)) {
+                        return false; // pode capturar o atacante
+                    }
+
+                    // pode bloquear? (se ataque não for de cavalo)
+                    if (!(atacante instanceof Knight)) {
+                        List<Point> caminho = getCaminhoEntre(atacante.getX(), atacante.getY(), king.getX(), king.getY());
+                        for (Point ponto : caminho) {
+                            if (p.canMoveTo(ponto.x, ponto.y)) return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true; // nenhuma saída
+    }
+    
+ // Retorna a lista de peças que estão atacando o rei da cor indicada
+    private List<Piece> getAtacantesDoRei(boolean corRei) {
+        List<Piece> atacantes = new ArrayList<>();
+        Piece rei = findKing(corRei);
+        if (rei == null) return atacantes;
+
+        int x = rei.getX();
+        int y = rei.getY();
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Piece p = board[i][j];
+                if (p != null && p.getColor() != corRei && p.canMoveTo(x, y)) {
+                    atacantes.add(p);
+                }
+            }
+        }
+
+        return atacantes;
+    }
+    
+ // Retorna a lista de casas entre dois pontos em linha reta ou diagonal (exclui início e fim)
+    private List<Point> getCaminhoEntre(int x1, int y1, int x2, int y2) {
+        List<Point> caminho = new ArrayList<>();
+
+        int dx = Integer.compare(x2 - x1, 0);
+        int dy = Integer.compare(y2 - y1, 0);
+
+        int cx = x1 + dx;
+        int cy = y1 + dy;
+
+        while (cx != x2 || cy != y2) {
+            caminho.add(new Point(cx, cy));
+            cx += dx;
+            cy += dy;
+        }
+
+        return caminho;
+    }
+
+    
+    public boolean isStalemate(boolean color) {
+        if (isKingInCheck(color)) return false;
+
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                Piece p = board[x][y];
+                if (p != null && p.getColor() == color) {
+                    for (int dx = 0; dx < 8; dx++) {
+                        for (int dy = 0; dy < 8; dy++) {
+                            if (p.canMoveTo(dx, dy)) {
+                                // Simula movimento
+                                Piece originalDestino = board[dx][dy];
+                                Piece original = board[x][y];
+
+                                board[dx][dy] = p;
+                                board[x][y] = null;
+                                p.setPosition(dx, dy);
+
+                                boolean emCheque = isKingInCheck(color);
+
+                                // Desfaz movimento
+                                board[x][y] = original;
+                                board[dx][dy] = originalDestino;
+                                p.setPosition(x, y);
+
+                                if (!emCheque) return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
 
     @Override
     public void registrarObservador(Observador o) {

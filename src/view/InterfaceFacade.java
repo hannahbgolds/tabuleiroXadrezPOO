@@ -28,6 +28,8 @@ public class InterfaceFacade implements Observador {
 
     public void mostrarMensagem(String msg) {
         JOptionPane.showMessageDialog(null, msg, "Aviso", JOptionPane.INFORMATION_MESSAGE);
+        
+        JOptionPane.showMessageDialog(null, msg, "Fim da Partida", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void exibirMenuPromocao(int x, int y, boolean isBranco) {
