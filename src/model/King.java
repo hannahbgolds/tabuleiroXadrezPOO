@@ -24,19 +24,26 @@ class King extends Piece {
      */
     @Override
     public boolean canMoveTo(int x, int y) {
-        int dx = Math.abs(x - getX());
-        int dy = Math.abs(y - getY());
+        if (!ChessFacade.getInstance().isInBounds(x, y)) return false;
 
-        if ((dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0)) {
-            ChessFacade chess = ChessFacade.getInstance();
+        int dx = Math.abs(x - this.getX());
+        int dy = Math.abs(y - this.getY());
 
-            // Verifica se a casa de destino está ameaçada por inimigo
-            boolean ameacada = chess.isSquareUnderAttack(x, y, !getColor());
+        if (dx <= 1 && dy <= 1) {
+            Piece destino = ChessFacade.getInstance().getPieceAt(x, y);
 
-            return !ameacada;
+            // Se for peça aliada, não pode
+            if (destino != null && destino.getColor() == this.getColor()) return false;
+
+            // Verifica se o destino está sob ataque de outra peça (diferente do atacante)
+            if (!ChessFacade.getInstance().isSquareUnderAttack(x, y, !this.getColor())) {
+                return true;
+            }
         }
 
         return false;
     }
+
+
 }
 

@@ -90,11 +90,13 @@ public class ChessFacade implements Observado {
     public boolean selecionaCasa(int x, int y) {
         if (selectedPiece == null || !isInBounds(x, y)) return false;
 
+        // ✅ Nova validação: só permite casas válidas mesmo em situações de cheque
+        List<Point> validas = getCasasValidasParaPecaSelecionada();
+        boolean permitido = validas.stream().anyMatch(p -> p.x == x && p.y == y);
+        if (!permitido) return false;
+
         int fromX = selectedPiece.getX();
         int fromY = selectedPiece.getY();
-
-        // Verifica se pode se mover para a posição
-        if (!selectedPiece.canMoveTo(x, y)) return false;
 
         Piece destino = board[x][y];
         if (destino != null && destino.getColor() == selectedPiece.getColor()) {
@@ -105,20 +107,21 @@ public class ChessFacade implements Observado {
         board[fromX][fromY] = null;
         selectedPiece.move(x, y);              // atualiza posição interna primeiro
         board[x][y] = selectedPiece;           // depois grava no tabuleiro
-        
-        promoverPeao(x,y);
+
+        promoverPeao(x, y);
 
         // Troca o turno e limpa seleção
         whiteTurn = !whiteTurn;
         selectedPiece = null;
-        
+
         boolean emCheque = isKingInCheck(whiteTurn);
         if (emCheque) {
             System.out.println("Cheque no rei " + (whiteTurn ? "branco" : "preto") + "!");
         }
 
         notificarObservadores();
-        
+
+        // Verifica fim de jogo
         if (isCheckmate(!whiteTurn)) {
             for (Observador obs : observadores) {
                 if (obs instanceof InterfaceFacade gui) {
@@ -136,7 +139,7 @@ public class ChessFacade implements Observado {
         return true;
     }
 
-    private boolean isInBounds(int x, int y) {
+    public boolean isInBounds(int x, int y) {
         return x >= 0 && x <= 7 && y >= 0 && y <= 7;
     }
     
@@ -216,12 +219,17 @@ public class ChessFacade implements Observado {
 
         if (selectedPiece == null) return validMoves;
 
+        boolean emCheque = isKingInCheck(selectedPiece.getColor());
+
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 if (selectedPiece.canMoveTo(x, y)) {
                     Piece destino = board[x][y];
                     if (destino == null || destino.getColor() != selectedPiece.getColor()) {
-                        validMoves.add(new Point(x, y));
+                        // ✅ Aqui: se estiver em cheque, só pode mover se eliminar o cheque
+                        if (!emCheque || movimentoRemoveCheque(selectedPiece, x, y)) {
+                            validMoves.add(new Point(x, y));
+                        }
                     }
                 }
             }
@@ -412,6 +420,25 @@ public class ChessFacade implements Observado {
             }
         }
         return true;
+    }
+    
+    private boolean movimentoRemoveCheque(Piece p, int xDestino, int yDestino) {
+        int xOrigem = p.getX();
+        int yOrigem = p.getY();
+        Piece destinoOriginal = board[xDestino][yDestino];
+
+        board[xOrigem][yOrigem] = null;
+        board[xDestino][yDestino] = p;
+        p.setPosition(xDestino, yDestino); // simula movimento
+
+        boolean aindaEmCheque = isKingInCheck(p.getColor());
+
+        // desfaz movimento
+        board[xDestino][yDestino] = destinoOriginal;
+        board[xOrigem][yOrigem] = p;
+        p.setPosition(xOrigem, yOrigem);
+
+        return !aindaEmCheque;
     }
 
     @Override

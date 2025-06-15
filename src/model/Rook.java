@@ -23,6 +23,10 @@ class Rook extends Piece {
      */
     @Override
     public boolean canMoveTo(int x, int y) {
+        // Não pode mover para a mesma posição
+        if (x == getX() && y == getY()) return false;
+
+        // Movimento válido: linha reta horizontal OU vertical
         if (x != getX() && y != getY()) return false;
 
         int dx = Integer.compare(x, getX());
@@ -31,6 +35,7 @@ class Rook extends Piece {
         int cx = getX() + dx;
         int cy = getY() + dy;
 
+        // Verifica se tem peça no caminho (para antes da casa final)
         while (cx != x || cy != y) {
             if (ChessFacade.getInstance().getPieceAt(cx, cy) != null) return false;
             cx += dx;

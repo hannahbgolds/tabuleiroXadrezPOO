@@ -23,6 +23,10 @@ class Bishop extends Piece {
      */
     @Override
     public boolean canMoveTo(int x, int y) {
+        // Não pode mover para a mesma casa
+        if (x == getX() && y == getY()) return false;
+
+        // Movimento só é válido se for diagonal
         if (Math.abs(x - getX()) != Math.abs(y - getY())) return false;
 
         int dx = Integer.compare(x, getX());
@@ -31,12 +35,14 @@ class Bishop extends Piece {
         int cx = getX() + dx;
         int cy = getY() + dy;
 
-        while (cx != x && cy != y) {
+        // Verifica se há peças no caminho, mas PARA ANTES da casa de destino
+        while (cx != x || cy != y) {
             if (ChessFacade.getInstance().getPieceAt(cx, cy) != null) return false;
             cx += dx;
             cy += dy;
         }
 
+        // Casa de destino pode estar vazia ou conter peça adversária (validado externamente)
         return true;
     }
 
