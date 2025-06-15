@@ -6,12 +6,13 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-public class ChessFacade {
+public class ChessFacade implements Observado {
     private static ChessFacade instance;
 
     private Piece[][] board = new Piece[8][8];
     private Piece selectedPiece = null;
     private boolean whiteTurn = true; // true = branco, false = preto
+    private final List<Observador> observadores = new ArrayList<>();
 
     private ChessFacade() {
         inicializaTabuleiro();
@@ -114,6 +115,7 @@ public class ChessFacade {
             System.out.println("Cheque no rei " + (whiteTurn ? "branco" : "preto") + "!");
         }
 
+        notificarObservadores();
 
         return true;
     }
@@ -163,6 +165,8 @@ public class ChessFacade {
         }
         selectedPiece = null;
         whiteTurn = true;
+        
+        notificarObservadores();
     }
 
     // Apenas para testes — adiciona peça genérica
@@ -177,6 +181,8 @@ public class ChessFacade {
             default:
                 throw new IllegalArgumentException("Tipo de peça inválido: " + tipo);
         }
+        
+        notificarObservadores();
     }
     
     public String getPieceIdAt(int x, int y) {
@@ -255,8 +261,29 @@ public class ChessFacade {
 
         board[x][y] = novaPeca;
         System.out.println("Peão promovido a: " + escolha);
+        
+        notificarObservadores();
     }
 
+
+    @Override
+    public void registrarObservador(Observador o) {
+        if (!observadores.contains(o)) {
+            observadores.add(o);
+        }
+    }
+
+    @Override
+    public void removerObservador(Observador o) {
+        observadores.remove(o);
+    }
+
+    @Override
+    public void notificarObservadores() {
+        for (Observador o : observadores) {
+            o.atualizar();
+        }
+    }
 
     
 }

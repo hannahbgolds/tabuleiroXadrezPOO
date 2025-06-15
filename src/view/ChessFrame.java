@@ -1,24 +1,24 @@
 package view;
 
-import javax.swing.JFrame;
+import model.ChessFacade;
+
+import javax.swing.*;
 
 public class ChessFrame extends JFrame {
 
-    public ChessFrame() {
+    public ChessFrame(ChessFacade modelo, InterfaceFacade interfaceGUI) {
         setTitle("INF1636 - Xadrez");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
 
-        // Cria o painel de desenho e adiciona na janela
-        ChessPanel panel = new ChessPanel();
-        add(panel);
+        // Cria o painel do tabuleiro e conecta com a InterfaceFacade
+        ChessPanel panel = new ChessPanel(modelo);
+        interfaceGUI.setPainelDoTabuleiro(panel);
 
-        pack(); // ajusta o tamanho com base no painel
-        setLocationRelativeTo(null); // centraliza na tela
-        setVisible(true);
-    }
+        add(panel); // adiciona o tabuleiro à janela principal
 
-    public static void main(String[] args) {
-        new ChessFrame(); 
+        pack(); // ajusta tamanho da janela com base no painel
+        setLocationRelativeTo(null); // centraliza a janela
+        setVisible(true); // exibe a janela
     }
 }

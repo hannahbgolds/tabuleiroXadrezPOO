@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import model.ChessFacade;
 
 public class StartFrame extends JFrame {
 
@@ -97,7 +98,15 @@ public class StartFrame extends JFrame {
     }
 
     private void iniciarNovoJogo() {
+        ChessFacade modelo = ChessFacade.getInstance();
+        InterfaceFacade interfaceGUI = new InterfaceFacade();
+        modelo.registrarObservador(interfaceGUI);
+
         JOptionPane.showMessageDialog(this, "Novo jogo iniciado!");
+
+        ChessFrame frame = new ChessFrame(modelo, interfaceGUI);
+        frame.setVisible(true);
+        this.dispose(); // fecha o menu inicial
     }
 
     private void carregarPartidaSalva() {
