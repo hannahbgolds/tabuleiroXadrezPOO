@@ -82,14 +82,9 @@ public class ChessFacadeTest {
     @Test
     public void testBishopValidMove() {
         ChessFacade game = ChessFacade.getInstance();
-        game.selecionaPeca(2, 6); // tira peão da frente
-        game.selecionaCasa(2, 5);
-        
-        game.selecionaPeca(0, 1); // peão preto
-        game.selecionaCasa(0, 2); // joga com preto para passar a vez
-        
-        game.selecionaPeca(2, 7); // bispo branco
-        boolean resultado = game.selecionaCasa(4, 5); // movimento diagonal
+        game.limparTabuleiro();
+        game.adicionarPeca("bispo", 2, 7, true); 
+        boolean resultado = game.selecionaPeca(2, 7) && game.selecionaCasa(4, 5);
         assertTrue(resultado);
     }
 
@@ -106,14 +101,9 @@ public class ChessFacadeTest {
     @Test
     public void testQueenValidMove() {
         ChessFacade game = ChessFacade.getInstance();
-        game.selecionaPeca(3, 6); // tira peão
-        game.selecionaCasa(3, 5);
-        
-        game.selecionaPeca(0, 1); // peão preto
-        game.selecionaCasa(0, 2); // joga com preto para passar a vez
-        
-        game.selecionaPeca(3, 7); // rainha
-        boolean resultado = game.selecionaCasa(5, 5); // movimento diagonal
+        game.limparTabuleiro();
+        game.adicionarPeca("rainha", 3, 7, true);
+        boolean resultado = game.selecionaPeca(3, 7) && game.selecionaCasa(5, 5);
         assertTrue(resultado);
     }
 
@@ -185,7 +175,5 @@ public class ChessFacadeTest {
         assertTrue("Rei preto deve estar em cheque descoberto após movimento do peão",
                 game.isKingInCheck(false));
     }
-
-    
 
 }
