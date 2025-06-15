@@ -160,8 +160,8 @@ public class ChessFacadeTest {
     
     @Test
     public void testChequeDescoberto() {
-        ChessFacade game = ChessFacade.getInstance();
-        ChessFacade.resetInstanceForTests();
+        ChessFacade.resetInstanceForTests();                  
+        ChessFacade game = ChessFacade.getInstance();        
 
         game.limparTabuleiro();
 
