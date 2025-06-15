@@ -1,42 +1,40 @@
 package model;
 
 class King extends Piece {
+    private boolean movido = false;
 
-    /**
-     * Cria um novo Rei com posição inicial e cor.
-     *
-     * @param x     Coluna inicial.
-     * @param y     Linha inicial.
-     * @param color true para branco, false para preto.
-     */
     public King(int x, int y, boolean color) {
         super(x, y, color);
     }
 
-    /**
-     * Verifica se o Rei pode se mover para a posição (x, y).
-     * O Rei pode se mover uma casa em qualquer direção,
-     * desde que a casa de destino não esteja sob ataque.
-     *
-     * @param x Coluna de destino.
-     * @param y Linha de destino.
-     * @return true se o movimento for válido e seguro.
-     */
+    public boolean hasMoved() {
+        return movido;
+    }
+
+    @Override
+    public void move(int x, int y) {
+        super.move(x, y);
+        movido = true; // Marca que o rei já se moveu
+    }
+
     @Override
     public boolean canMoveTo(int x, int y) {
         int dx = Math.abs(x - getX());
         int dy = Math.abs(y - getY());
 
-        if ((dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0)) {
-            ChessFacade chess = ChessFacade.getInstance();
+        ChessFacade chess = ChessFacade.getInstance();
 
-            // Verifica se a casa de destino está ameaçada por inimigo
+        // Movimento normal (1 casa em qualquer direção)
+        if (dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0)) {
             boolean ameacada = chess.isSquareUnderAttack(x, y, !getColor());
-
             return !ameacada;
+        }
+
+        // Verifica se é um roque
+        if (!movido && dy == 0 && dx == 2) {
+            return chess.canCastle(this, x > getX()); // true = roque pequeno, false = roque grande
         }
 
         return false;
     }
 }
-
