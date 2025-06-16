@@ -1,14 +1,8 @@
 package model;
 
 class Rook extends Piece {
+    private boolean movido = false; // Novo campo para rastrear se a torre já se moveu
 
-    /**
-     * Cria uma nova Torre com posição inicial e cor.
-     *
-     * @param x     Coluna inicial no tabuleiro.
-     * @param y     Linha inicial no tabuleiro.
-     * @param color true para branco, false para preto.
-     */
     public Rook(int x, int y, boolean color) {
         super(x, y, color);
     }
@@ -44,5 +38,16 @@ class Rook extends Piece {
 
         return true;
     }
-}
 
+    // Novo método para verificar se a torre já se moveu
+    public boolean hasMoved() {
+        return movido;
+    }
+
+    // Sobrescreve o método move() para marcar que a torre se moveu
+    @Override
+    public void move(int x, int y) {
+        super.move(x, y);
+        movido = true;
+    }
+}

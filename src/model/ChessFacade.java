@@ -86,7 +86,7 @@ public class ChessFacade implements Observado {
         return false;
     }
 
-    // Tenta mover a peça selecionada para a nova posição
+ // Tenta mover a peça selecionada para a nova posição
     public boolean selecionaCasa(int x, int y) {
         if (selectedPiece == null || !isInBounds(x, y)) return false;
 
@@ -98,24 +98,28 @@ public class ChessFacade implements Observado {
         int fromX = selectedPiece.getX();
         int fromY = selectedPiece.getY();
 
-        Piece destino = board[x][y];
-        if (destino != null && destino.getColor() == selectedPiece.getColor()) {
-            return false; // não pode capturar peça da mesma cor
+        // Verifica se é um roque
+        if (selectedPiece instanceof King && Math.abs(x - fromX) == 2) {
+            boolean isKingside = (x > fromX);
+            return performCastle((King) selectedPiece, isKingside); // realiza roque e já retorna
         }
 
-        // Atualiza o tabuleiro: move a peça e limpa a casa antiga
+        // Movimento normal
+        Piece destino = board[x][y];
+        if (destino != null && destino.getColor() == selectedPiece.getColor()) {
+            return false;
+        }
+
         board[fromX][fromY] = null;
-        selectedPiece.move(x, y);              // atualiza posição interna primeiro
-        board[x][y] = selectedPiece;           // depois grava no tabuleiro
+        selectedPiece.move(x, y);              // atualiza posição da peça
+        board[x][y] = selectedPiece;
 
         promoverPeao(x, y);
 
-        // Troca o turno e limpa seleção
         whiteTurn = !whiteTurn;
         selectedPiece = null;
 
-        boolean emCheque = isKingInCheck(whiteTurn);
-        if (emCheque) {
+        if (isKingInCheck(whiteTurn)) {
             System.out.println("Cheque no rei " + (whiteTurn ? "branco" : "preto") + "!");
         }
 
@@ -460,6 +464,64 @@ public class ChessFacade implements Observado {
         }
     }
 
+    public boolean canCastle(King king, boolean isKingside) {
+        if (king.hasMoved() || isKingInCheck(king.getColor())) {
+            return false;
+        }
+
+        int y = king.getY();
+        int rookX = isKingside ? 7 : 0; // Torre do lado do rei (pequeno) ou da dama (grande)
+        Piece rook = getPieceAt(rookX, y);
+
+        // Verifica se a torre existe e não se moveu
+        if (!(rook instanceof Rook) || ((Rook) rook).hasMoved()) {
+            return false;
+        }
+
+        // Verifica se o caminho está livre e não está sob ataque
+        int step = isKingside ? 1 : -1;
+        int startX = king.getX() + step;
+        int endX = isKingside ? 6 : 2;
+
+        for (int x = startX; x != rookX; x += step) {
+            if (getPieceAt(x, y) != null || isSquareUnderAttack(x, y, !king.getColor())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean performCastle(King king, boolean isKingside) {
+        if (!canCastle(king, isKingside)) {
+            return false;
+        }
+
+        int y = king.getY();
+        int rookX = isKingside ? 7 : 0;
+        Rook rook = (Rook) getPieceAt(rookX, y);
+
+        // Remove o rei e a torre das posições originais
+        board[king.getX()][y] = null;
+        board[rookX][y] = null;
+
+        // Define as novas posições
+        int newKingX = isKingside ? 6 : 2;
+        int newRookX = isKingside ? 5 : 3;
+
+        // Atualiza a posição interna do rei e da torre
+        king.move(newKingX, y);  // Isso marca o rei como "movido"
+        rook.move(newRookX, y);  // Isso marca a torre como "movido"
+
+        // Coloca as peças nas novas posições no tabuleiro
+        board[newKingX][y] = king;
+        board[newRookX][y] = rook;
+
+        whiteTurn = !whiteTurn;
+        notificarObservadores();
+
+        return true;
+    }
     
 }
 
