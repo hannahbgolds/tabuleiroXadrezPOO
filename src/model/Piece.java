@@ -86,4 +86,8 @@ abstract class Piece {
     protected void pósMovimento() {
         // Por padrão, não faz nada
     }
+    
+    public boolean isAttacking(int x, int y) {
+        return canMoveTo(x, y);
+    }
 }

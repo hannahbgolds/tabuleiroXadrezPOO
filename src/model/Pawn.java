@@ -68,5 +68,16 @@ class Pawn extends Piece {
     protected void pósMovimento() {
         hasMoved = true;
     }
+    
+    @Override
+    public boolean isAttacking(int x, int y) {
+        int dx = x - getX();
+        int dy = y - getY();
+        boolean isBranco = getColor();
+        int direcao = isBranco ? -1 : 1;
+
+        // Só considera ataque se for na diagonal
+        return Math.abs(dx) == 1 && dy == direcao;
+    }
 }
 
