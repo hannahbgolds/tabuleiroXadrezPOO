@@ -90,7 +90,6 @@ public class ChessFacade implements Observado {
     public boolean selecionaCasa(int x, int y) {
         if (selectedPiece == null || !isInBounds(x, y)) return false;
 
-        // ✅ Nova validação: só permite casas válidas mesmo em situações de cheque
         List<Point> validas = getCasasValidasParaPecaSelecionada();
         boolean permitido = validas.stream().anyMatch(p -> p.x == x && p.y == y);
         if (!permitido) return false;
@@ -116,6 +115,9 @@ public class ChessFacade implements Observado {
 
         promoverPeao(x, y);
 
+        // ⚠️ Salva a cor atual antes de inverter
+        boolean corAtual = whiteTurn;
+
         whiteTurn = !whiteTurn;
         selectedPiece = null;
 
@@ -125,14 +127,14 @@ public class ChessFacade implements Observado {
 
         notificarObservadores();
 
-        // Verifica fim de jogo
-        if (isCheckmate(!whiteTurn)) {
+        // ✅ Usa a cor do jogador que acabou de jogar para verificar se o oponente perdeu
+        if (isCheckmate(!corAtual)) {
             for (Observador obs : observadores) {
                 if (obs instanceof InterfaceFacade gui) {
-                    gui.mostrarMensagem("Xeque-mate! O jogador " + (whiteTurn ? "branco" : "preto") + " venceu!");
+                    gui.mostrarMensagem("Xeque-mate! O jogador " + (corAtual ? "branco" : "preto") + " venceu!");
                 }
             }
-        } else if (isStalemate(!whiteTurn)) {
+        } else if (isStalemate(!corAtual)) {
             for (Observador obs : observadores) {
                 if (obs instanceof InterfaceFacade gui) {
                     gui.mostrarMensagem("Empate por congelamento (stalemate).");
@@ -142,6 +144,7 @@ public class ChessFacade implements Observado {
 
         return true;
     }
+
 
     public boolean isInBounds(int x, int y) {
         return x >= 0 && x <= 7 && y >= 0 && y <= 7;
