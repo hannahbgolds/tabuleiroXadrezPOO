@@ -67,8 +67,9 @@ public class ChessPanel extends Canvas {
 
                 JMenuItem salvar = new JMenuItem("Salvar Partida");
                 salvar.addActionListener(ev -> {
-                    JOptionPane.showMessageDialog(null, "Função de salvar ainda não implementada.");
+                    model.salvarEstadoPartida(); 
                 });
+
 
                 JMenuItem encerrar = new JMenuItem("Encerrar Partida");
                 encerrar.addActionListener(ev -> {

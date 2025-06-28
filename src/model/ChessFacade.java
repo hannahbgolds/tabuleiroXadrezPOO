@@ -197,16 +197,15 @@ public class ChessFacade implements Observado {
 
     // Apenas para testes — adiciona peça genérica
     public void adicionarPeca(String tipo, int x, int y, boolean cor) {
-        switch (tipo.toLowerCase()) {
-            case "rei": board[x][y] = new King(x, y, cor); break;
-            case "rainha": board[x][y] = new Queen(x, y, cor); break;
-            case "torre": board[x][y] = new Rook(x, y, cor); break;
-            case "bispo": board[x][y] = new Bishop(x, y, cor); break;
-            case "cavalo": board[x][y] = new Knight(x, y, cor); break;
-            case "peao": board[x][y] = new Pawn(x, y, cor); break;
-            default:
-                throw new IllegalArgumentException("Tipo de peça inválido: " + tipo);
-        }
+    	switch (tipo.toLowerCase()) {
+        case "rei", "king": board[x][y] = new King(x, y, cor); break;
+        case "rainha", "queen": board[x][y] = new Queen(x, y, cor); break;
+        case "torre", "rook": board[x][y] = new Rook(x, y, cor); break;
+        case "bispo", "bishop": board[x][y] = new Bishop(x, y, cor); break;
+        case "cavalo", "knight": board[x][y] = new Knight(x, y, cor); break;
+        case "peao", "pawn": board[x][y] = new Pawn(x, y, cor); break;
+        default: throw new IllegalArgumentException("Tipo de peça inválido: " + tipo);
+    }
         
         notificarObservadores();
     }
@@ -526,6 +525,17 @@ public class ChessFacade implements Observado {
         return true;
     }
     
+    public boolean isWhiteTurn() {
+        return whiteTurn;
+    }
+
+    public void setTurno(boolean whiteTurn) {
+        this.whiteTurn = whiteTurn;
+    }
+    
+    public void salvarEstadoPartida() {
+        PartidaIO.salvar(this, null);
+    }
 }
 
 

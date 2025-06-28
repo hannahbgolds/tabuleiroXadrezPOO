@@ -3,6 +3,7 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 import model.ChessFacade;
+import model.PartidaIO;
 
 public class StartFrame extends JFrame {
 
@@ -110,7 +111,15 @@ public class StartFrame extends JFrame {
     }
 
     private void carregarPartidaSalva() {
-        JOptionPane.showMessageDialog(this, "Continuar a disputar uma partida interrompida...");
+        ChessFacade modelo = ChessFacade.getInstance();
+        InterfaceFacade interfaceGUI = new InterfaceFacade();
+        modelo.registrarObservador(interfaceGUI);
+
+        PartidaIO.carregar(modelo, this);
+
+        ChessFrame frame = new ChessFrame(modelo, interfaceGUI);
+        frame.setVisible(true);
+        this.dispose(); // fecha o menu inicial
     }
 
     public static void main(String[] args) {
