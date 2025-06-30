@@ -225,25 +225,51 @@ public class ChessFacade implements Observado {
 
         if (selectedPiece == null) return validMoves;
 
-        boolean emCheque = isKingInCheck(selectedPiece.getColor());
-
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 if (selectedPiece.canMoveTo(x, y)) {
                     Piece destino = board[x][y];
                     if (destino == null || destino.getColor() != selectedPiece.getColor()) {
-                        // ✅ Aqui: se estiver em cheque, só pode mover se eliminar o cheque
-                        if (!emCheque || movimentoRemoveCheque(selectedPiece, x, y)) {
+                        if (movimentoMantemReiSeguro(selectedPiece, x, y)) {
                             validMoves.add(new Point(x, y));
                         }
                     }
                 }
             }
         }
-
         return validMoves;
     }
-    
+
+    /**
+     * Garante que o movimento não expõe o rei ao cheque,
+     * mesmo que ele não esteja em cheque inicialmente.
+     */
+    private boolean movimentoMantemReiSeguro(Piece p, int xDestino, int yDestino) {
+        int xOrigem = p.getX();
+        int yOrigem = p.getY();
+        Piece destinoOriginal = board[xDestino][yDestino];
+
+        // simula
+        board[xOrigem][yOrigem] = null;
+        board[xDestino][yDestino] = p;
+        p.setPosition(xDestino, yDestino);
+
+        Piece pAnteriorSelecionada = selectedPiece;
+        selectedPiece = p;
+
+        boolean reiFicaEmCheque = isKingInCheck(p.getColor());
+
+        // desfaz
+        board[xDestino][yDestino] = destinoOriginal;
+        board[xOrigem][yOrigem] = p;
+        p.setPosition(xOrigem, yOrigem);
+
+        selectedPiece = pAnteriorSelecionada;
+
+        return !reiFicaEmCheque;
+    }
+
+
     public boolean isPathClear(int x1, int y1, int x2, int y2) {
         int dx = Integer.compare(x2 - x1, 0);
         int dy = Integer.compare(y2 - y1, 0);

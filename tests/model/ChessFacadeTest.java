@@ -165,15 +165,16 @@ public class ChessFacadeTest {
 
         game.limparTabuleiro();
 
-        game.adicionarPeca("rei", 4, 0, false);     // Rei preto
-        game.adicionarPeca("torre", 4, 3, true);    // Torre branca
-        game.adicionarPeca("peao", 4, 2, true);     // Peão branco bloqueando
+        game.adicionarPeca("rei", 4, 0, false);     // rei preto
+        game.adicionarPeca("torre", 4, 3, true);    // torre branca
+        game.adicionarPeca("cavalo", 4, 2, true);   // cavalo branco bloqueando
 
         game.selecionaPeca(4, 2);
-        game.selecionaCasa(4, 1); // Peão sai da frente → torre ameaça o rei
+        game.selecionaCasa(5, 4); // cavalo sai da frente
 
-        assertTrue("Rei preto deve estar em cheque descoberto após movimento do peão",
+        assertTrue("Rei preto deve estar em cheque descoberto após movimento do cavalo",
                 game.isKingInCheck(false));
     }
+
 
 }
